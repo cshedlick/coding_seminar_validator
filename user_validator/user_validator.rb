@@ -5,27 +5,20 @@ require 'csv'
 class Validate
   def initialize(filename)
     @filename = filename
-    @data = CSV.read(@filename)
+    @data = CSV.read(@filename, :headers=>true)
+    @emails = @data['email']
+    @phones = @data['phone']
+    @joineds = @data['joined']
   end
-
-  # def get_names
-  #   good_stuff = []
-  #   @data.each do |subarray|
-  #     subarray.each do |string|
-  #       good_stuff << string.scan(regular_expression)
-  #     end
-  #   end
-  #   good_stuff
-  # end
 
   def get_phones
     good_phones = []
     good_phones_count = 0
-    @data.each do |subarray|
-      subarray.each do |string|
-        good_phones += string.scan(/[^0]\d{2}(\S|\) )\d{3}\S\d{4}/) ##three digits, followed by either `-`  `.`  `)`  `) `, followed by three more digits, followed by either a - a . or nothing, then a non-zero value
+    @phones.each do |string|
+      # subarray.each do |string|
+        good_phones += string.scan(/[^0]\S\d{4}/) ##three digits, followed by either `-`  `.`  `)`  `) `, followed by three more digits, followed by either a - a . or nothing, then a non-zero value
         # good_phones_count += 1
-      end
+      # end
     end
     good_phones
     # puts good_phones_count
@@ -35,48 +28,53 @@ class Validate
     good_emails = []
     good_emails_count = 0
     bad_emails_count = 0
-    @data.each do |subarray|
-      subarray.each do |string|
+    @emails.each do |string|
+      # subarray.each do |string|
         good_emails += string.scan(/^\w{1,}[@]\w{1,}[.]\w{2,}$/) #at least one word character, @, at least one more word character, ., then at least two more word characters
-        # good_emails_count += 1
-      end
+      # end
     end
     good_emails
-    # puts good_emails_count
   end
 
-  def validation
+  def valid_email?(input)
+    !!input['email'].scan(/^\w{1,}[@]\w{1,}[.]\w{2,}$/) #.scan or .match
+  end
+
+  def get_joined
+    good_joined = []
+    good_joined_count = 0
+    bad_joined_count = 0
+    @joineds.each do |string|
+      # subarray.each do |string|
+        good_joined += string.scan(/^\d{1,2}\S\d{1,2}\S\d{2,4}$/) # not the final regular expression for this
+      # end
+    end
+    good_joined
+  end
+
+  def valid_joined?(input)
+    !!input['joined'].scan(/^\d{1,2}\S\d{1,2}\S\d{2,4}$/)
+  end
+
+  def all_valid?
+    valid_rows = []
     @data.each do |validate|
-      validate.each (included in) @data.get_emails && @data.get_emails && @data.get_joined #good_phones && good_emails && good_joined
+      # subarray.each do |validate|
+        # @data.get_emails.include? validate['email']
+      valid_rows << valid_email?(validate) && valid_joined?(validate)
+    # end
+    end
+    @data.select{valid_rows}
+  end
+
+
 
 
 end
 
 homework = Validate.new('homework.csv')
-puts homework.get_emails
-puts homework.good_emails.length
+# puts homework.get_emails
+# puts homework.get_joined
+# puts homework.get_phones
 
-# class InvalidJoined < StandardError
-# end
-#
-# class InvalidEmail < StandardError
-# end
-#
-# class InvalidPhone < StandardError
-# end
-
-
-# class UnknownCurrencyCodeError < StandardError
-# end
-
-# name:, joined:, age:, email:, phone:, password:
-
-
-# def convert(obj, code)
-#     raise CurrencyCodeError.new('That currency code is unknown') unless rates[obj.code] && rates[code]
-#     if obj.code == code
-#       Currency.new(amount: obj.amount, code: objcode)
-#     else
-#       Currency.new(amount: (obj.amount * rates[code]) / rates[obj.code], code: code)
-#     end
-#   end
+puts homework.all_valid?
