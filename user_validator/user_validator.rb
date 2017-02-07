@@ -30,7 +30,7 @@ class Validate
     bad_emails_count = 0
     @emails.each do |string|
       # subarray.each do |string|
-        good_emails += string.scan(/^\w{1,}[@]\w{1,}[.]\w{2,}$/) #at least one word character, @, at least one more word character, ., then at least two more word characters
+        good_emails += string (/^\w{1,}[@]\w{1,}[.]\w{2,}$/) #at least one word character, @, at least one more word character, ., then at least two more word characters
       # end
     end
     good_emails
@@ -56,16 +56,19 @@ class Validate
     !!input['joined'].scan(/^\d{1,2}\S\d{1,2}\S\d{2,4}$/)
   end
 
-  def all_valid?
-    valid_rows = []
-    @data.each do |validate|
-      # subarray.each do |validate|
-        # @data.get_emails.include? validate['email']
-      valid_rows << valid_email?(validate) && valid_joined?(validate)
-    # end
-    end
-    @data.select{valid_rows}
-  end
+  # def all_valid?
+  #   valid_rows = []
+  #   valid_count = 0
+  #   invalid_count = 0
+  #   @data.each do |validate|
+  #     # subarray.each do |validate|
+  #       # @data.get_emails.include? validate['email']
+  #     valid_rows << valid_email?(validate) && valid_joined?(validate)
+  #     valid_count += 1
+  #   # end
+  #   end
+  #   @data.select{valid_rows}
+  # end
 
 
 
@@ -76,5 +79,5 @@ homework = Validate.new('homework.csv')
 # puts homework.get_emails
 # puts homework.get_joined
 # puts homework.get_phones
-
-puts homework.all_valid?
+puts homework.get_emails
+# puts homework.all_valid?
